@@ -2,13 +2,15 @@ import fs from 'fs';
 import https from 'https';
 import path from 'path';
 import readline from 'readline';
+
 import MemoryStream from 'memorystream';
 import requireFromString from 'require-from-string';
-
 import solc from 'solc';
 
 const INPUT_DIR = path.join(__dirname, '../contracts');
 const OUTPUT_DIR = path.join(__dirname, '../build');
+
+const binaries = {};
 
 export async function compileAll(evmVersion: string): Promise<void> {
     const directory = path.join(INPUT_DIR, evmVersion);
@@ -23,13 +25,16 @@ export async function compileAll(evmVersion: string): Promise<void> {
     }
 }
 
-export async function compile(inputFileName: string, evmVersion: string): Promise<void> {
+export async function compile(
+    inputFileName: string,
+    evmVersion: string
+): Promise<void> {
     console.log('Compiling', inputFileName, '...');
 
     const contractName = inputFileName.split('.sol')[0];
     const outputFileName = contractName + '.json';
 
-    const inputFilePath = path.join(INPUT_DIR, evmVersion, inputFileName)
+    const inputFilePath = path.join(INPUT_DIR, evmVersion, inputFileName);
     const outputFilePath = path.join(OUTPUT_DIR, outputFileName);
 
     const content = await fs.promises.readFile(inputFilePath);
@@ -39,16 +44,16 @@ export async function compile(inputFileName: string, evmVersion: string): Promis
     const input = {
         language: 'Solidity',
         sources: {
-            [inputFileName]: { content: content.toString() }
+            [inputFileName]: { content: content.toString() },
         },
         settings: {
             evmVersion,
             outputSelection: {
                 '*': {
-                    [contractName]: ['abi', 'evm.bytecode', 'metadata']
-                }
-            }
-        }
+                    [contractName]: ['abi', 'evm.bytecode', 'metadata'],
+                },
+            },
+        },
     };
 
     const output = solcV.compile(JSON.stringify(input));
@@ -58,11 +63,14 @@ export async function compile(inputFileName: string, evmVersion: string): Promis
         console.log('Compilation failure', outputJson.errors);
     } else {
         try {
-        await fs.promises.mkdir(OUTPUT_DIR);
+            await fs.promises.mkdir(OUTPUT_DIR);
         } catch (err) {
             if (err.code != 'EEXIST') throw err;
         }
-        await fs.promises.writeFile(outputFilePath, JSON.stringify(outputJson, null, 4));
+        await fs.promises.writeFile(
+            outputFilePath,
+            JSON.stringify(outputJson, null, 4)
+        );
         console.log('Compilation success', outputFileName);
     }
 }
@@ -70,7 +78,7 @@ export async function compile(inputFileName: string, evmVersion: string): Promis
 async function getSolcVersion(filePath: string): Promise<string> {
     const rl = readline.createInterface({
         input: fs.createReadStream(filePath),
-        crlfDelay: Infinity
+        crlfDelay: Infinity,
     });
 
     let version: string | null = null;
@@ -81,24 +89,26 @@ async function getSolcVersion(filePath: string): Promise<string> {
             version = groups.version;
             break;
         }
-    };
-    if (!version) throw Error('No pragma solidity version found')
+    }
+    if (!version) throw Error('No pragma solidity version found');
     return version;
 }
 
 async function loadRemoteVersion(semver: string): Promise<any> {
+    if (binaries[semver]) return binaries[semver];
     const baseUrl = 'https://binaries.soliditylang.org/bin';
     const binListUrl = baseUrl + '/list.json';
     const binList = await handleRequest(binListUrl, true);
     const release = binList.releases[semver];
     const binary = await handleRequest(baseUrl + '/' + release);
     const solcV = solc.setupMethods(requireFromString(binary, release));
+    binaries[semver] = solcV;
     return solcV;
 }
 
 function handleRequest(url: string, json?: boolean): Promise<any> {
     return new Promise((resolve, reject) => {
-        const memoryStream = new MemoryStream(null, {readable: false});
+        const memoryStream = new MemoryStream(null, { readable: false });
         const req = https.get(url, (res) => {
             res.setEncoding('utf8');
 
@@ -106,7 +116,7 @@ function handleRequest(url: string, json?: boolean): Promise<any> {
 
             res.on('end', () => {
                 if (json) {
-                resolve(JSON.parse(memoryStream.toString()));
+                    resolve(JSON.parse(memoryStream.toString()));
                 } else {
                     resolve(memoryStream.toString());
                 }
