@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "outDir": "./dist",
+        "target": "es6",
+        "sourceMap": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "esModuleInterop": true
+    },
+    "include": ["./src/**/*"],
+    "compileOnSave": true
+}
