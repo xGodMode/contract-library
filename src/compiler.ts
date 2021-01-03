@@ -45,7 +45,7 @@ export async function compile(inputFileName: string, evmVersion: string): Promis
             evmVersion,
             outputSelection: {
                 '*': {
-                    '*': ['*']
+                    [contractName]: ['abi', 'evm.bytecode', 'metadata']
                 }
             }
         }
@@ -62,8 +62,8 @@ export async function compile(inputFileName: string, evmVersion: string): Promis
         } catch (err) {
             if (err.code != 'EEXIST') throw err;
         }
-        await fs.promises.writeFile(outputFilePath, output);
-        console.log('Compilation success', contractName);
+        await fs.promises.writeFile(outputFilePath, JSON.stringify(outputJson, null, 4));
+        console.log('Compilation success', outputFileName);
     }
 }
 
