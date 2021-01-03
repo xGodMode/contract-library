@@ -10,26 +10,27 @@ import solc from 'solc';
 const INPUT_DIR = path.join(__dirname, '../contracts');
 const OUTPUT_DIR = path.join(__dirname, '../build');
 
-export async function compileAll(): Promise<void> {
-    const files = await fs.promises.readdir(INPUT_DIR);
+export async function compileAll(evmVersion: string): Promise<void> {
+    const directory = path.join(INPUT_DIR, evmVersion);
+    const files = await fs.promises.readdir(directory);
     await Promise.all(files.map(handleFile));
     function handleFile(file: string): Promise<void> {
         try {
-            return compile(file);
+            return compile(file, evmVersion);
         } catch (error) {
             console.error(error);
         }
     }
 }
 
-export async function compile(inputFileName: string): Promise<void> {
+export async function compile(inputFileName: string, evmVersion: string): Promise<void> {
     console.log('Compiling', inputFileName, '...');
 
     const contractName = inputFileName.split('.sol')[0];
+    const outputFileName = contractName + '.json';
 
-    const inputFilePath = path.join(INPUT_DIR, inputFileName)
-
-    const outputFilePath = path.join(OUTPUT_DIR, contractName + '.json');
+    const inputFilePath = path.join(INPUT_DIR, evmVersion, inputFileName)
+    const outputFilePath = path.join(OUTPUT_DIR, outputFileName);
 
     const content = await fs.promises.readFile(inputFilePath);
     const semver = await getSolcVersion(inputFilePath);
@@ -41,7 +42,7 @@ export async function compile(inputFileName: string): Promise<void> {
             [inputFileName]: { content: content.toString() }
         },
         settings: {
-            evmVersion: 'constantinople',
+            evmVersion,
             outputSelection: {
                 '*': {
                     '*': ['*']

@@ -1,7 +1,8 @@
 import { compile, compileAll } from '../compiler';
 
 async function main() {
-    await compileAll();
+    await compileAll('constantinople');
+    await compileAll('byzantium');
 }
 
 main()
