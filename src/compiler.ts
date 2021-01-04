@@ -1,11 +1,10 @@
 import fs from 'fs';
-import https from 'https';
 import path from 'path';
 import readline from 'readline';
 
-import MemoryStream from 'memorystream';
 import requireFromString from 'require-from-string';
 import solc from 'solc';
+import { handleRequest } from './utils';
 
 const INPUT_DIR = path.join(__dirname, '../contracts');
 const OUTPUT_DIR = path.join(__dirname, '../build');
@@ -98,34 +97,10 @@ async function loadRemoteVersion(semver: string): Promise<any> {
     if (binaries[semver]) return binaries[semver];
     const baseUrl = 'https://binaries.soliditylang.org/bin';
     const binListUrl = baseUrl + '/list.json';
-    const binList = await handleRequest(binListUrl, true);
+    const binList = await handleRequest(binListUrl, { json: true });
     const release = binList.releases[semver];
     const binary = await handleRequest(baseUrl + '/' + release);
     const solcV = solc.setupMethods(requireFromString(binary, release));
     binaries[semver] = solcV;
     return solcV;
-}
-
-function handleRequest(url: string, json?: boolean): Promise<any> {
-    return new Promise((resolve, reject) => {
-        const memoryStream = new MemoryStream(null, { readable: false });
-        const req = https.get(url, (res) => {
-            res.setEncoding('utf8');
-
-            res.pipe(memoryStream);
-
-            res.on('end', () => {
-                if (json) {
-                    resolve(JSON.parse(memoryStream.toString()));
-                } else {
-                    resolve(memoryStream.toString());
-                }
-            });
-        });
-
-        req.on('error', (err) => {
-            reject(err);
-        });
-        req.end();
-    });
 }
