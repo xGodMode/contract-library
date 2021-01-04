@@ -1,0 +1,1 @@
+export { installer } from './installer';

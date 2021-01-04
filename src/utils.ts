@@ -4,10 +4,12 @@ import MemoryStream from 'memorystream';
 
 export async function handleRequest(
     url: string,
-    options: { json?: boolean; stream?: boolean } = {}
+    options: { readable?: boolean; json?: boolean; stream?: boolean } = {}
 ): Promise<string | object | MemoryStream> {
     return new Promise((resolve, reject) => {
-        const memoryStream = new MemoryStream(null, { readable: false });
+        const memoryStream = new MemoryStream(null, {
+            readable: options.readable || false,
+        });
         const req = https.get(url, (res) => {
             res.setEncoding('utf8');
 
