@@ -7,15 +7,15 @@ import solc from 'solc';
 import { handleRequest } from './utils';
 
 const INPUT_DIR = path.join(__dirname, '../contracts');
-const OUTPUT_DIR = path.join(__dirname, '../build');
+const OUTPUT_DIR = path.join(__dirname, '../build/contracts');
 
 const binaries = {};
 
-export async function compileAll(evmVersion: string): Promise<void> {
+export async function compileAll(evmVersion: string): Promise<string[]> {
     const directory = path.join(INPUT_DIR, evmVersion);
     const files = await fs.promises.readdir(directory);
-    await Promise.all(files.map(handleFile));
-    function handleFile(file: string): Promise<void> {
+    return await Promise.all(files.map(handleFile));
+    function handleFile(file: string): Promise<string> {
         try {
             return compile(file, evmVersion);
         } catch (error) {
@@ -27,7 +27,7 @@ export async function compileAll(evmVersion: string): Promise<void> {
 export async function compile(
     inputFileName: string,
     evmVersion: string
-): Promise<void> {
+): Promise<string> {
     console.log('Compiling', inputFileName, '...');
 
     const contractName = inputFileName.split('.sol')[0];
@@ -66,11 +66,14 @@ export async function compile(
         } catch (err) {
             if (err.code != 'EEXIST') throw err;
         }
+
         await fs.promises.writeFile(
             outputFilePath,
             JSON.stringify(outputJson, null, 4)
         );
+
         console.log('Compilation success', outputFileName);
+        return outputFileName;
     }
 }
 
