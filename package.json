@@ -13,7 +13,9 @@
     "/README.md"
   ],
   "scripts": {
+    "build": "node_modules/typescript/bin/tsc",
     "compile": "node dist/scripts/compile.js",
+    "wipe": "rm -R build/contracts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -R node_modules"
   },
