@@ -2,6 +2,8 @@ import https from 'https';
 
 import MemoryStream from 'memorystream';
 
+import { HTTPError } from '@xgm/error-codes';
+
 export async function handleRequest(
     url: string,
     options: { readable?: boolean; json?: boolean; stream?: boolean } = {}
@@ -11,6 +13,13 @@ export async function handleRequest(
             readable: options.readable || false,
         });
         const req = https.get(url, (res) => {
+            if (res.statusCode >= 400) {
+                throw HTTPError(
+                    res.statusCode,
+                    `${url} ${res.statusCode} ${res.statusMessage}`
+                );
+            }
+
             res.setEncoding('utf8');
 
             res.pipe(memoryStream);

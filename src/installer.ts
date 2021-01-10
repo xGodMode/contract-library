@@ -3,6 +3,7 @@ import path from 'path';
 import { handleRequest } from './utils';
 
 const OUTPUT_DIR = path.join(process.cwd(), './build/contracts');
+const CONTRACTS_LIST_PATH = path.join(__dirname, '../build/contracts.txt');
 
 /**
  * Downloads compiled GM contracts from github and installs them into a project
@@ -15,12 +16,16 @@ export async function installer(contracts?: string[] | undefined) {
     } catch (err) {
         if (err.code != 'EEXIST') throw err;
     }
+    const allContractNames = await getAllContractNames();
     if (contracts == undefined) {
-        contracts = await getAllContractNames();
+        contracts = allContractNames;
     }
     await Promise.all(contracts.map(handleContract));
     function handleContract(contractName: string): Promise<void> {
         try {
+            if (!allContractNames.includes(contractName)) {
+                throw Error('No contract with that name exists');
+            }
             return install(contractName);
         } catch (error) {
             console.error(`Failed to install ${contractName}:`, error.message);
@@ -30,11 +35,13 @@ export async function installer(contracts?: string[] | undefined) {
 }
 
 async function getAllContractNames(): Promise<Array<string>> {
-    const contractListUrl = `https://raw.githubusercontent.com/xGodMode/contract-library/main/build/contracts.txt`;
-    const list = (await handleRequest(contractListUrl)).split('\n');
-    return list.map((name: string) => {
-        return name.split('.json')[0];
-    });
+    const list = await fs.promises.readFile(CONTRACTS_LIST_PATH);
+    return list
+        .toString()
+        .split('\n')
+        .map((name: string) => {
+            return name.split('.json')[0];
+        });
 }
 
 async function install(contractName: string) {
