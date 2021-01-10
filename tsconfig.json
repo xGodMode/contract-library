@@ -1,6 +1,8 @@
 {
     "compilerOptions": {
         "allowJs": true,
+        "declaration": true,
+        "declarationMap": true,
         "outDir": "./dist",
         "target": "es6",
         "sourceMap": true,
