@@ -49,7 +49,12 @@ export async function compile(
             evmVersion,
             outputSelection: {
                 '*': {
-                    [contractName]: ['abi', 'evm.bytecode', 'metadata'],
+                    [contractName]: [
+                        'abi',
+                        'evm.bytecode',
+                        'evm.deployedBytecode',
+                        'metadata',
+                    ],
                 },
             },
         },
