@@ -67,6 +67,7 @@
       ]
     },
     "git": {
+      "requireBranch": "main",
       "commitMessage": "release: v${version}"
     },
     "github": {
