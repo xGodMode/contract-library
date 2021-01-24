@@ -8,26 +8,29 @@
   },
   "engineStrict": true,
   "files": [
+    "/build/protocols.txt",
     "/dist",
     "/LICENSE",
     "/README.md"
   ],
   "scripts": {
     "compile": "npm run dist && node dist/scripts/compile.js",
-    "dist": "node_modules/typescript/bin/tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -R node_modules",
-    "clean:build": "rm -R build/protocols"
+    "clean:build": "rm -R build/protocols",
+    "dist": "node_modules/typescript/bin/tsc",
+    "release": "dotenv release-it -- --only-version --verbose",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xGodMode/contract-library.git"
   },
   "keywords": [
+    "xgm",
     "godmode",
     "ethereum",
     "solidity",
-    "contract"
+    "smart-contracts"
   ],
   "author": "valmack",
   "license": "MIT",
@@ -36,7 +39,7 @@
   },
   "homepage": "https://github.com/xGodMode/contract-library#readme",
   "dependencies": {
-    "@xgm/error-codes": "0.0.1",
+    "@xgm/error-codes": "^0.0.3",
     "glob": "^7.1.6",
     "memorystream": "^0.3.1",
     "require-from-string": "^2.0.2",
@@ -44,6 +47,7 @@
   },
   "devDependencies": {
     "@types/node": "^14.14.19",
+    "dotenv-cli": "^4.0.0",
     "husky": "^4.3.6",
     "prettier": "^2.2.1",
     "pretty-quick": "^3.1.0",
@@ -56,11 +60,20 @@
     }
   },
   "release-it": {
+    "hooks": {
+      "before:init": [
+        "npm install",
+        "npm run compile"
+      ]
+    },
     "git": {
       "commitMessage": "release: v${version}"
     },
     "github": {
       "release": true
     }
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
