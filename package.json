@@ -1,6 +1,6 @@
 {
   "name": "@xgm/contract-library",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Godmode Contract Library",
   "main": "dist/index",
   "engines": {
