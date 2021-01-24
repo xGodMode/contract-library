@@ -15,9 +15,9 @@
   "scripts": {
     "compile": "npm run dist && node dist/scripts/compile.js",
     "dist": "node_modules/typescript/bin/tsc",
-    "wipe": "rm -R build/contracts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rm -R node_modules"
+    "clean": "rm -R node_modules",
+    "clean:build": "rm -R build/protocols"
   },
   "repository": {
     "type": "git",
@@ -37,6 +37,7 @@
   "homepage": "https://github.com/xGodMode/contract-library#readme",
   "dependencies": {
     "@xgm/error-codes": "0.0.1",
+    "glob": "^7.1.6",
     "memorystream": "^0.3.1",
     "require-from-string": "^2.0.2",
     "solc": "^0.8.0"
