@@ -1,7 +1,7 @@
 /**
- * Generates compiled contracts in the build directory.
- *
  * Internal use only.
+ *
+ * Generates compiled protocols in the build directory.
  */
 
 import path from 'path';
@@ -11,16 +11,24 @@ import { compileAll } from '../compiler';
 
 const COMPILED_LIST_FILE_PATH = path.join(
     __dirname,
-    '../../build/contracts.txt'
+    '../../build/protocols.txt'
 );
 
 async function main() {
-    const constantinople = await compileAll('constantinople');
+    // IMPORTANT: Currently we assume that a given protocol has all its requisite
+    // contracts under the same compiler version. This may not be true and should
+    // be accounted for at some point.
     const byzantium = await compileAll('byzantium');
-    const compiledContracts = [...constantinople, ...byzantium].join('\n');
+    const constantinople = await compileAll('constantinople');
+    const istanbul = await compileAll('istanbul');
+    const compiledProtocols = [
+        ...byzantium,
+        ...constantinople,
+        ...istanbul,
+    ].join('\n');
 
     const fd = await fs.promises.open(COMPILED_LIST_FILE_PATH, 'w');
-    await fd.write(compiledContracts);
+    await fd.write(compiledProtocols);
     await fd.close();
 }
 

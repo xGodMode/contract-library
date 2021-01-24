@@ -37,7 +37,7 @@ export async function compile(
     const outputFilePath = path.join(OUTPUT_DIR, outputFileName);
 
     const content = await fs.promises.readFile(inputFilePath);
-    const semver = await getSolcVersion(inputFilePath);
+    const semver = await getSolcSemver(inputFilePath);
     const solcV = await loadRemoteVersion(semver);
 
     const input = {
@@ -82,7 +82,7 @@ export async function compile(
     }
 }
 
-async function getSolcVersion(filePath: string): Promise<string> {
+export async function getSolcSemver(filePath: string): Promise<string> {
     const rl = readline.createInterface({
         input: fs.createReadStream(filePath),
         crlfDelay: Infinity,
@@ -92,16 +92,20 @@ async function getSolcVersion(filePath: string): Promise<string> {
     for await (const line of rl) {
         if (line.startsWith('pragma')) {
             const regex = /^pragma solidity [\^\~\>\<]?=?(?<version>[0-9\.]*);/;
-            const groups = line.match(regex).groups;
-            version = groups.version;
-            break;
+            try {
+                const groups = line.match(regex).groups;
+                version = groups.version;
+                break;
+            } catch (error) {
+                throw Error('Failed to parse pragma solidity version');
+            }
         }
     }
     if (!version) throw Error('No pragma solidity version found');
     return version;
 }
 
-async function loadRemoteVersion(semver: string): Promise<any> {
+export async function loadRemoteVersion(semver: string): Promise<any> {
     if (binaries[semver]) return binaries[semver];
     const baseUrl = 'https://binaries.soliditylang.org/bin';
     const binListUrl = baseUrl + '/list.json';
