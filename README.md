@@ -1,3 +1,6 @@
+![GodMode Logo](https://godmode-public-assets.s3.amazonaws.com/godmode_logo.jpg)
+
+
 Godmode Contract Library holds plug-and-play Godmode versions of smart contracts
 deployed on Ethereum mainnet.
 
