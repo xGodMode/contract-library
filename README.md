@@ -25,3 +25,21 @@ Then run the following command to install the protocol's contracts into your pro
 ```sh
 npx install godmode
 ```
+
+## Development
+
+Start by installing dependencies:
+```
+npm install
+```
+
+Then to add a new protocol:
+1. Create a directory called `<new-protocol-name>` under the appropriate EVM version ("byzantium"|"constantinople"|"istanbul")
+1. Add the required Solidity files to the directory
+1. **IMPORTANT!!** Prefix the GM-ified contracts with `GM` (e.g. GMDai)
+1. Run the compile command
+```
+npm run compile
+```
+5. Check that the `<new-protocol-name>.json` file includes the ABI and bytecode of the GM contracts
+6. Check that the `protocols.txt` file includes the name of the protocol you added
