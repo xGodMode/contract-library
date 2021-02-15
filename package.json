@@ -18,8 +18,6 @@
     "clean": "rm -R node_modules",
     "clean:build": "rm -R build/protocols",
     "dist": "node_modules/typescript/bin/tsc",
-    "prepublishOnly": "npm run compile",
-    "publish": "npm run release",
     "release": "dotenv release-it -- --only-version --verbose",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
