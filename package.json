@@ -62,8 +62,7 @@
   "release-it": {
     "hooks": {
       "before:init": [
-        "npm install",
-        "npm run compile"
+        "npm install"
       ]
     },
     "git": {
