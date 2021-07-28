@@ -1,3 +1,4 @@
 Compound.json
 Maker.json
 UniswapV2.json
+Tether.json

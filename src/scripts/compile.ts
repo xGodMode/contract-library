@@ -21,10 +21,12 @@ async function main() {
     const byzantium = await compileAll('byzantium');
     const constantinople = await compileAll('constantinople');
     const istanbul = await compileAll('istanbul');
+    const berlin = await compileAll('berlin');
     const compiledProtocols = [
         ...byzantium,
         ...constantinople,
         ...istanbul,
+        ...berlin,
     ].join('\n');
 
     const fd = await fs.promises.open(COMPILED_LIST_FILE_PATH, 'w');
